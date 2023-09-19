@@ -15,6 +15,9 @@
     "stimulus",
     "plugin"
   ],
+  "publishConfig": {
+    "access": "public"
+  },
   "version": "0.1.0",
   "main": "dist/index.js",
   "module": "dist/index.mjs",
