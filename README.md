@@ -17,7 +17,21 @@ Originally a [Webpack plugin](https://github.com/hotwired/stimulus-webpack-helpe
 
 ## Installation
 
-TODO
+Install the package with your favorite package manager.
+
+```sh
+# npm
+npm install -D bun-stimulus-plugin
+
+# yarn
+yarn add -D bun-stimulus-plugin
+
+# pnpm
+pnpm add -D bun-stimulus-plugin
+
+# bun
+bun add --d bun-stimulus-plugin
+```
 
 ## Usage
 
@@ -25,6 +39,8 @@ First, you need to use the plugin. This can only be done using the Bun API (Bun 
 
 ```ts
 // build.ts
+import { bunStimulusPlugin } from 'bun-stimulus-plugin';
+
 await Bun.build({
     // ...
     plugins: [bunStimulusPlugin()],
@@ -63,10 +79,11 @@ This plugin can receive an options object as its first argument.
 await Bun.build({
     // ...
     plugins: [
+        // Default values
         bunStimulusPlugin({
-            strict: false, // If false, ignore invalid paths (definitions will be empty) -- default: true
-            controllerSuffix: /my_suffix.(ts|js)$/gi, // Only load controllers with this suffix -- default: /(-|_)controller.(js|ts|jsx|tsx)$/gi
-            directorySeparator: '__', // The separator used for nested controllers -- default: '--'
+            strict: true, // If false, ignore invalid paths (definitions will be empty)
+            controllerSuffix: /(-|_)controller.(js|ts|jsx|tsx)$/gi, // Only load controllers with this suffix
+            directorySeparator: '--', // The separator used for nested controllers
         }),
     ],
 });
@@ -80,7 +97,8 @@ await Bun.build({
 
 ### Usage with TypeScript
 
-TODO
+TypeScript definitions for `'stimulus:'` imports should be automatically registered with this plugin.
+If not, you can always add them manually with `bun-stimulus-plugin/types/import-definition`.
 
 ## Contributing
 
