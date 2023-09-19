@@ -1,7 +1,7 @@
 {
   "overrides": [
     {
-      "files": ["*.js", "*.ts", "*.tsx", ".eslintrc", ".prettierrc.json"],
+      "files": ["*.js", "*.ts", "*.tsx", ".eslintrc", ".prettierrc.json", "*.yaml", "*.yml"],
       "options": {
         "tabWidth": 2
       }

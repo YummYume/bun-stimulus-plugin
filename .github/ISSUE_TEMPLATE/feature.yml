@@ -2,7 +2,7 @@ name: Feature
 
 description: Request a new feature
 
-title: "[FEATURE] <title>"
+title: '[FEATURE] <title>'
 
 labels: [feature]
 
