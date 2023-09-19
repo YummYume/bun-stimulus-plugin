@@ -3,7 +3,7 @@ name: CI
 on:
   push:
     branches:
-      - "**"
+      - '**'
 
 jobs:
   build:
@@ -31,7 +31,8 @@ jobs:
 
       # Run tests in a Docker container to ensure correct absolute paths
       - name: Run tests
-        run: docker run --rm -v $$(pwd):/home/bun/bun-stimulus-plugin -w /home/bun/bun-stimulus-plugin oven/bun:1.0 sh -c "bun install --frozen-lockfile && bun test"
+        run: |
+          docker run --rm -v $(pwd):/home/bun/bun-stimulus-plugin -w /home/bun/bun-stimulus-plugin oven/bun:1.0 sh -c "bun install --frozen-lockfile && bun test"
 
   lint:
     runs-on: ubuntu-latest

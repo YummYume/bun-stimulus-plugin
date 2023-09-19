@@ -73,9 +73,9 @@ await Bun.build({
 ```
 
 | Option               | Description                                                                                                                                       |
-| -------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------- | --- | --- | ------- |
+| -------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `strict`             | If set to true, the plugin will throw an error if a given path is not a directory. Otherwise, it will simply ignore the path. Defaults to `true`. |
-| `controllerSuffix`   | The suffix of the controller files to load. Defaults to `(-                                                                                       | \_)controller.(js | ts  | jsx | tsx)$`. |
+| `controllerSuffix`   | The suffix of the controller files to load. Defaults to `/(-\|_)controller.(js\|ts\|jsx\|tsx)$/gi`                                                |
 | `directorySeparator` | The directory separator to use when parsing nested controllers. Defaults to '--'.                                                                 |
 
 ### Usage with TypeScript
