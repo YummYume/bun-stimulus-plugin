@@ -1,5 +1,8 @@
 # Bun Stimulus Plugin
 
+[![CI](https://github.com/YummYume/bun-stimulus-plugin/actions/workflows/ci.yaml/badge.svg)](https://github.com/YummYume/bun-stimulus-plugin/actions/workflows/ci.yaml)
+[![Release](https://github.com/YummYume/bun-stimulus-plugin/actions/workflows/release.yml/badge.svg)](https://github.com/YummYume/bun-stimulus-plugin/actions/workflows/release.yml)
+
 This plugin allows registering [Stimulus](https://stimulus.hotwired.dev/) controllers automatically from a directory with [Bun](https://bun.sh/).
 Originally a [Webpack plugin](https://github.com/hotwired/stimulus-webpack-helpers) made by Hotwired, this plugin is inspired from [esbuild-plugin-stimulus](https://github.com/zombiezen/esbuild-plugin-stimulus).
 
@@ -30,7 +33,7 @@ yarn add -D bun-stimulus-plugin
 pnpm add -D bun-stimulus-plugin
 
 # bun
-bun add --d bun-stimulus-plugin
+bun add -d bun-stimulus-plugin
 ```
 
 ## Usage
