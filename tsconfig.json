@@ -1,0 +1,26 @@
+{
+    "compilerOptions": {
+        "lib": ["ESNext"],
+        "module": "CommonJS",
+        "target": "ES2016",
+        "moduleDetection": "force",
+        "allowImportingTsExtensions": true,
+        "noEmit": true,
+        "composite": true,
+        "strict": true,
+        "downlevelIteration": true,
+        "skipLibCheck": true,
+        "jsx": "preserve",
+        "allowSyntheticDefaultImports": true,
+        "forceConsistentCasingInFileNames": true,
+        "allowJs": false,
+        "noUncheckedIndexedAccess": true,
+        "esModuleInterop": true,
+        "types": [
+            "bun-types" // add Bun global
+        ],
+        "paths": {
+            "$custom-controllers/*": ["./test/src/custom-controllers/*"]
+        }
+    }
+}

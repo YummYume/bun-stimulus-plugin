@@ -1,0 +1,16 @@
+{
+  "overrides": [
+    {
+      "files": ["*.js", "*.ts", "*.tsx", ".eslintrc", ".prettierrc.json"],
+      "options": {
+        "tabWidth": 2
+      }
+    }
+  ],
+  "printWidth": 120,
+  "quoteProps": "consistent",
+  "singleQuote": true,
+  "tabWidth": 4,
+  "trailingComma": "all",
+  "useTabs": false
+}

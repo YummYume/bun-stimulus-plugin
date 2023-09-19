@@ -1,0 +1,70 @@
+name: Bug
+
+description: File a bug report
+
+title: "[BUG] <title>"
+
+labels: [bug]
+
+body:
+  - type: markdown
+    attributes:
+      value: Before opening a bug report, make sure there isn't an already existing issue addressing the same bug.
+
+  - type: textarea
+    id: bug-description
+    attributes:
+      label: Bug description
+      description: A full description of the bug you are experiencing.
+    validations:
+      required: true
+
+  - type: input
+    id: bun-version
+    attributes:
+      label: Bun version
+      description: Which version of Bun are you using?
+    validations:
+      required: true
+
+  - type: input
+    id: current-output
+    attributes:
+      label: Current output
+      description: A small sentence describing the result you are getting.
+    validations:
+      required: false
+
+  - type: input
+    id: expected-output
+    attributes:
+      label: Expected output
+      description: A small sentence describing the result you expected to have.
+    validations:
+      required: false
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      description: Which steps do we need to take to reproduce this error?
+    validations:
+      required: false
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Relevant log output
+      description: If applicable, provide relevant log output.
+      render: Texinfo
+    validations:
+      required: false
+
+  - type: checkboxes
+    id: terms
+    attributes:
+      label: Code of Conduct
+      description: By submitting this issue, you agree to follow our [Code of Conduct](https://github.com/YummYume/bun-stimulus-plugin/CODE_OF_CONDUCT.md).
+      options:
+        - label: I agree to follow this project's Code of Conduct
+          required: true

@@ -1,0 +1,7 @@
+dist/*
+node_modules/*
+package.json
+*.lock
+.github/*
+.vscode/*
+test/build/*

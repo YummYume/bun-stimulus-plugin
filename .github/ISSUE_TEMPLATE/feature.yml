@@ -1,0 +1,29 @@
+name: Feature
+
+description: Request a new feature
+
+title: "[FEATURE] <title>"
+
+labels: [feature]
+
+body:
+  - type: markdown
+    attributes:
+      value: Open a new feature to improve this library. Please check out for other existing issues first that could resemble your demand.
+
+  - type: textarea
+    id: feature-description
+    attributes:
+      label: Feature description
+      description: A full description of the feature you are requesting.
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: terms
+    attributes:
+      label: Code of Conduct
+      description: By submitting this issue, you agree to follow our [Code of Conduct](https://github.com/YummYume/bun-stimulus-plugin/CODE_OF_CONDUCT.md).
+      options:
+        - label: I agree to follow this project's Code of Conduct
+          required: true

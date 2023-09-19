@@ -1,0 +1,14 @@
+version: '3.9'
+
+services:
+    bun-stimulus-plugin:
+        image: oven/bun:1.0
+        working_dir: /home/bun/bun-stimulus-plugin
+        user: bun
+        entrypoint: ['./bun.sh']
+        volumes:
+            - ./:/home/bun/bun-stimulus-plugin
+        stdin_open: true
+        tty: true
+        restart: unless-stopped
+        container_name: bun-stimulus-plugin

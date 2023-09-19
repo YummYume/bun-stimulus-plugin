@@ -1,0 +1,7 @@
+dist/*
+node_modules/*
+.eslintrc
+.github/*
+.changeset/*
+.vscode/*
+test/build/*
