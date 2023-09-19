@@ -30,7 +30,7 @@ yarn add -D bun-stimulus-plugin
 pnpm add -D bun-stimulus-plugin
 
 # bun
-bun add --d bun-stimulus-plugin
+bun add -d bun-stimulus-plugin
 ```
 
 ## Usage
