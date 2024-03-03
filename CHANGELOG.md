@@ -1,5 +1,11 @@
 # bun-stimulus-plugin
 
+## 2.1.0
+
+### Minor Changes
+
+- bd36e21: Fix type generation and build.
+
 ## 2.0.2
 
 ### Patch Changes
