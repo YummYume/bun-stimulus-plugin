@@ -10,7 +10,8 @@ compose.yml
 Makefile
 tsconfig.json
 tsup.config.ts
-.changeset
-.github
-node_modules
-test
+.changeset/
+.github/
+node_modules/
+src/
+test/
