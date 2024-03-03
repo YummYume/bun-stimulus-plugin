@@ -1,5 +1,11 @@
 # bun-stimulus-plugin
 
+## 2.0.2
+
+### Patch Changes
+
+- daf0cee: Exclude src folder from package
+
 ## 2.0.1
 
 ### Patch Changes
