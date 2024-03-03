@@ -1,40 +1,103 @@
-import { type BunPlugin } from 'bun';
+import DuplicateDefinitionError from './duplicate-definition-error';
+import { type ControllerDefinition, parseControllers } from './utils';
 
+import type { BunPlugin } from 'bun';
+
+export type BunStimulusPluginDuplicateDefinition = 'error' | 'ignore' | 'replace';
+
+/**
+ * Options for the Bun Stimulus plugin duplicate definition handling option.
+ */
+export type BunStimulusPluginDuplicateDefinitionHandling =
+  | BunStimulusPluginDuplicateDefinition
+  | ((
+      exisitingDefinition: ControllerDefinition,
+      duplicateDefinition: ControllerDefinition,
+    ) => BunStimulusPluginDuplicateDefinition);
+
+/**
+ * Options for the Bun Stimulus plugin.
+ */
 export type BunStimulusPluginOptions = {
   /**
-   * If set to true, the plugin will throw an error if a given path is not a directory. Otherwise, it will simply ignore the path. Defaults to `true`.
+   * If set to true, the plugin will throw an error if a given path is not a directory. Otherwise, it will simply ignore the path.
+   * Defaults to `true`.
+   *
+   * @since 1.0.0
    */
   strict: boolean;
   /**
-   * The suffix of the controller files to load. Defaults to `(-|_)controller.(js|ts|jsx|tsx)$`.
+   * The suffix of the controller files to load. Will be removed from the controller's name.
+   * Defaults to `(-|_)controller.(js|ts|jsx|tsx)$`.
+   *
+   * @since 1.0.0
    */
-  controllerSuffix: RegExp;
+  controllerSuffix: RegExp | null;
   /**
-   * The directory separator to use when parsing nested controllers. Defaults to '--'.
+   * The suffix of the directory to load. Will be removed from the controller's name.
+   * This option is the same as the `controllerSuffix` option, but for controllers found using the `directoryIdentifier` option.
+   * Defaults to `null`.
+   *
+   * @since 2.0.0
+   */
+  controllerDirectorySuffix: RegExp | null;
+  /**
+   * The glob pattern to use to identify files that should be registered with their file name.
+   * Set to `null` to disable this feature. Defaults to `**\/*`.
+   *
+   * @since 2.0.0
+   */
+  fileIdentifier: string | null;
+  /**
+   * The glob pattern to use to identify files that should be registered with their parent directory name.
+   * Set to `null` to disable this feature. Defaults to `null`.
+   *
+   * @since 2.0.0
+   */
+  directoryIdentifier: string | null;
+  /**
+   * The directory separator to use when parsing nested controllers. Defaults to `--`.
+   *
+   * @since 1.0.0
    */
   directorySeparator: string;
+  /**
+   * How to handle duplicate controller definitions. Duplicate definitions can either be ignored, replaced, or throw an error.
+   * A callback can also be provided to handle the duplicate definitions. It should return either `error`, `ignore`, or `replace`.
+   * Defaults to `ignore`.
+   *
+   * @since 2.0.0
+   */
+  duplicateDefinitionHandling: BunStimulusPluginDuplicateDefinitionHandling;
 };
 
-type ControllerDefinition = {
-  identifier: string;
-  name: string;
-};
-
+/**
+ * The identifier used by the plugin to resolve the import path.
+ */
 const identifier = 'stimulus:';
+/**
+ * The namespace used by the plugin.
+ */
 const namespace = 'bun-stimulus-plugin';
+/**
+ * The default options for the plugin.
+ */
 const defaultOptions: BunStimulusPluginOptions = {
   strict: true,
   controllerSuffix: /(-|_)controller.(js|ts|jsx|tsx)$/gi,
+  controllerDirectorySuffix: null,
+  fileIdentifier: '**/*',
+  directoryIdentifier: null,
   directorySeparator: '--',
+  duplicateDefinitionHandling: 'ignore',
 };
-const parseControllerName = (controllerName: string) => controllerName.replace(/[^a-zA-Z0-9 ]/g, '_');
 
 export const bunStimulusPlugin = (
   bunStimulusPluginOptions: Partial<BunStimulusPluginOptions> = defaultOptions,
 ): BunPlugin => ({
   name: 'bun-stimulus-plugin',
   async setup(build) {
-    const { existsSync, readdirSync, statSync } = await import('node:fs');
+    const { existsSync, statSync } = await import('node:fs');
     const { join, sep } = await import('node:path');
     const options = { ...defaultOptions, ...bunStimulusPluginOptions };
 
@@ -81,77 +144,50 @@ export const bunStimulusPlugin = (
         };
       }
 
-      // Will contain all the controller definitions exported as default
-      const definitions: ControllerDefinition[] = [];
+      try {
+        // Will contain all the controller definitions exported as default
+        const parsedControllers = parseControllers(args.path, { options });
+        const { definitions } = parsedControllers;
 
-      /*
-        This will look something like this:
-        import my_controller1 from './controllers/my_controller_controller';
+        /*
+          This will look something like this:
+          import my_controller1 from './controllers/my_controller_controller';
 
-        export default [
-          {identifier: 'my_controller', controllerConstructor: my_controller1},
-        ];
-      */
-      let contents = '';
-      let i = 0;
+          export default [
+            {identifier: 'my_controller', controllerConstructor: my_controller1},
+          ];
+        */
+        let { contents } = parsedControllers;
 
-      // Will return an array of controller names or directories
-      const getControllersFromPath = (controllersPath: string) =>
-        readdirSync(controllersPath).filter((file) => {
-          const fileStats = statSync(join(controllersPath, file));
+        // Export the controller definitions
+        // Will be used like this: `import definitions from 'stimulus:./controllers';`
+        contents += 'export default [';
 
-          return fileStats.isDirectory() || file.match(options.controllerSuffix);
-        });
-      // Parse all the controllers in the given path and handle nested controllers
-      const parseControllers = (controllersPath: string, prefix: string = '') => {
-        const controllersFromPath = getControllersFromPath(controllersPath);
-
-        for (const controller of controllersFromPath) {
-          const controllerPath = join(controllersPath, controller);
-          const controllerStats = statSync(controllerPath);
-          // Name of the controller without the suffix and with directory separators
-          const controllerName = `${prefix}${controller.replace(options.controllerSuffix, '')}`;
-
-          if (controllerStats.isDirectory()) {
-            // Recursively parse the controllers
-            parseControllers(controllerPath, `${controllerName}${options.directorySeparator}`);
-          } else {
-            // Controller name should be unique, so we'll add a number to the end of it
-            const uniqueControllerName = `${parseControllerName(controllerName)}${(i += 1)}`;
-
-            // Import the controller
-            contents += `import ${uniqueControllerName} from '${join(
-              args.path,
-              ...prefix.split(options.directorySeparator),
-              controller,
-            )}';`;
-
-            definitions.push({
-              identifier: controllerName,
-              name: uniqueControllerName,
-            });
-          }
+        for (const [index, definition] of definitions.entries()) {
+          contents += `{identifier: '${definition.identifier}', controllerConstructor: ${definition.name}}${
+            index < definitions.length - 1 ? ',' : ''
+          }`;
         }
-      };
 
-      parseControllers(args.path);
+        contents += '];';
 
-      // Export the controller definitions
-      // Will be used like this: `import definitions from 'stimulus:./controllers';`
-      contents += 'export default [';
+        return {
+          contents,
+          loader: 'js',
+        };
+      } catch (error) {
+        if (error instanceof DuplicateDefinitionError) {
+          return {
+            errors: [
+              {
+                text: error.message,
+              },
+            ],
+          };
+        }
 
-      for (const [index, definition] of definitions.entries()) {
-        contents += `{identifier: '${definition.identifier}', controllerConstructor: ${definition.name}}${
-          index < definitions.length - 1 ? ',' : ''
-        }`;
+        throw error;
       }
-
-      contents += '];';
-
-      return {
-        contents,
-        loader: 'js',
-      };
     });
   },
 });
