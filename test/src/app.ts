@@ -9,7 +9,7 @@ import { exportDefinitions } from './utils';
 // Load the Stimulus application
 const app = Application.start();
 
-// Register the controllers in ./controllers
+// Register the controllers
 app.load(relativeDefinitions);
 app.load(customDefinitions);
 app.load(absoluteDefinitions);

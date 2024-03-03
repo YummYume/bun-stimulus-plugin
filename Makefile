@@ -42,4 +42,8 @@ format:
 
 # Changeset
 changeset:
-	$(EXEC) bunx changeset
+	bunx changeset
+
+# Update
+update:
+	$(EXEC) bunx npm-check-updates -i

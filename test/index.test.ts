@@ -5,19 +5,13 @@ import { test, expect, describe, beforeAll, beforeEach, afterAll } from 'bun:tes
 
 import { rmSync } from 'node:fs';
 
+import { appendScriptToDocument, buildWithEntrypointAndOptions, importDefinitions, removeMeta } from './utils';
+
 import { bunStimulusPlugin } from '../src';
 
-const importDefinitions = (name: string) => {
-  try {
-    const definitions = JSON.parse(
-      document.head.querySelector<HTMLMetaElement>(`meta[name="${name}"]`)?.content ?? '[]',
-    ) as string[];
+import type { Window } from 'happy-dom';
 
-    return definitions;
-  } catch (error) {
-    return [];
-  }
-};
+declare const window: Window;
 
 // Build the app before running tests
 beforeAll(async () => {
@@ -58,63 +52,75 @@ afterAll(() => {
 // Reset the DOM before each test
 beforeEach(() => {
   document.body.innerHTML = '';
-  // document.head.querySelectorAll<HTMLMetaElement>('meta').forEach((meta) => meta.remove());
 });
 
 // Ensure controllers are registered and work properly
 describe('Controllers', () => {
-  test('Non-nested relative controller is registered and works', () => {
+  test('Non-nested relative controller is registered and works', async () => {
     document.body.innerHTML = `<p data-controller="relative"></p>`;
 
     const result = document.querySelector('p');
 
+    await window.happyDOM.waitUntilComplete();
+
     expect(result?.textContent).toBe('Relative controller!');
   });
 
-  test('Nested relative controller is registered and works', () => {
+  test('Nested relative controller is registered and works', async () => {
     document.body.innerHTML = `<p data-controller="nested--relative"></p>`;
 
     const result = document.querySelector('p');
+
+    await window.happyDOM.waitUntilComplete();
 
     expect(result?.textContent).toBe('Nested relative controller!');
   });
 
   // TODO: Remove skip once custom paths are supported
-  test.skip('Non-nested custom controller is registered and works', () => {
+  test.skip('Non-nested custom controller is registered and works', async () => {
     document.body.innerHTML = `<p data-controller="custom"></p>`;
 
     const result = document.querySelector('p');
+
+    await window.happyDOM.waitUntilComplete();
 
     expect(result?.textContent).toBe('Custom controller!');
   });
 
   // TODO: Remove skip once custom paths are supported
-  test.skip('Nested custom controller is registered and works', () => {
+  test.skip('Nested custom controller is registered and works', async () => {
     document.body.innerHTML = `<p data-controller="nested--custom"></p>`;
 
     const result = document.querySelector('p');
 
+    await window.happyDOM.waitUntilComplete();
+
     expect(result?.textContent).toBe('Nested custom controller!');
   });
 
-  test('Non-nested absolute controller is registered and works', () => {
+  test('Non-nested absolute controller is registered and works', async () => {
     document.body.innerHTML = `<p data-controller="absolute"></p>`;
 
     const result = document.querySelector('p');
 
+    await window.happyDOM.waitUntilComplete();
+
     expect(result?.textContent).toBe('Absolute controller!');
   });
 
-  test('Nested absolute controller is registered and works', () => {
+  test('Nested absolute controller is registered and works', async () => {
     document.body.innerHTML = `<p data-controller="nested--absolute"></p>`;
 
     const result = document.querySelector('p');
+
+    await window.happyDOM.waitUntilComplete();
 
     expect(result?.textContent).toBe('Nested absolute controller!');
   });
 });
 
 // Ensure controller definitions match the expected values
+// Note: These tests use the already appended meta tags from the 'Controllers' tests
 describe('Controller definitions', () => {
   const relativeDefinitions = ['relative', 'nested--relative'];
   const customDefinitions = ['custom', 'nested--custom'];
@@ -171,30 +177,12 @@ describe('Options', () => {
   });
 
   test('Directory separator option works', async () => {
-    await Bun.build({
-      entrypoints: ['./test/src/options/app-directory-separator.ts'],
-      outdir: './test/dist',
-      target: 'browser',
-      splitting: true,
-      format: 'esm',
-      minify: true,
-      naming: '[dir]/[name].[ext]',
-      plugins: [
-        bunStimulusPlugin({
-          strict: false,
-          directorySeparator: '__',
-        }),
-      ],
+    const appContent = await buildWithEntrypointAndOptions('./test/src/options/app-directory-separator.ts', {
+      strict: false,
+      directorySeparator: '__',
     });
 
-    const app = Bun.file('./test/dist/app-directory-separator.js');
-    const appContent = await app.text();
-
-    const script = document.createElement('script');
-    script.type = 'text/javascript';
-    script.textContent = appContent;
-
-    document.head.appendChild(script);
+    appendScriptToDocument(appContent);
 
     const definitions = importDefinitions('directory-separator-definitions');
 
@@ -202,9 +190,85 @@ describe('Options', () => {
   });
 
   test('Controller suffix option works', async () => {
-    await Bun.build({
-      entrypoints: ['./test/src/options/app-suffix.ts'],
-      outdir: './test/dist',
+    const appContent = await buildWithEntrypointAndOptions('./test/src/options/app-suffix.ts', {
+      strict: false,
+      controllerSuffix: /_ctrl.ts$/gi,
+    });
+
+    appendScriptToDocument(appContent);
+
+    const definitions = importDefinitions('suffix-definitions');
+
+    expect(definitions).toBeArrayOfSize(1);
+    expect(definitions).toEqual(['relative']);
+  });
+
+  test('Directory-based controllers should be registered', async () => {
+    const appContent = await buildWithEntrypointAndOptions('./test/src/options/app-directory-controllers.ts', {
+      strict: false,
+      fileIdentifier: null,
+      directoryIdentifier: '**/controller.ts',
+    });
+
+    appendScriptToDocument(appContent);
+
+    const definitions = importDefinitions('directory-definitions');
+
+    expect(definitions).toBeArrayOfSize(2);
+    expect(definitions.sort()).toEqual(['directory', 'directory_controller'].sort());
+  });
+
+  test('Directory-based controllers with suffix should work', async () => {
+    const appContent = await buildWithEntrypointAndOptions('./test/src/options/app-directory-controllers.ts', {
+      strict: false,
+      fileIdentifier: null,
+      directoryIdentifier: '**/controller.ts',
+      controllerDirectorySuffix: /_controller$/gi,
+    });
+
+    removeMeta('directory-definitions');
+    appendScriptToDocument(appContent);
+
+    const definitions = importDefinitions('directory-definitions');
+
+    expect(definitions).toBeArrayOfSize(1);
+    expect(definitions).toContain('directory');
+  });
+
+  test('Duplicate controller with "ignore" should only register once', async () => {
+    const appContent = await buildWithEntrypointAndOptions('./test/src/options/app-duplicate-handling.ts', {
+      strict: false,
+      directoryIdentifier: '**/controller.ts',
+    });
+
+    appendScriptToDocument(appContent);
+
+    const definitions = importDefinitions('duplicate-definitions');
+
+    expect(definitions).toBeArrayOfSize(1);
+    expect(definitions).toContain('duplicate');
+  });
+
+  test('Duplicate controller with "replace" should only register once', async () => {
+    const appContent = await buildWithEntrypointAndOptions('./test/src/options/app-duplicate-handling.ts', {
+      strict: false,
+      directoryIdentifier: '**/controller.ts',
+      duplicateDefinitionHandling: 'replace',
+    });
+
+    removeMeta('duplicate-definitions');
+    appendScriptToDocument(appContent);
+
+    const definitions = importDefinitions('duplicate-definitions');
+
+    expect(definitions).toBeArrayOfSize(1);
+    expect(definitions).toContain('duplicate');
+  });
+
+  test('Duplicate controller with "error" should fail build', async () => {
+    const build = await Bun.build({
+      entrypoints: ['./test/src/options/app-duplicate-handling.ts'],
+      outdir: './test/dist/strict',
       target: 'browser',
       splitting: true,
       format: 'esm',
@@ -212,24 +276,34 @@ describe('Options', () => {
       naming: '[dir]/[name].[ext]',
       plugins: [
         bunStimulusPlugin({
-          strict: false,
-          controllerSuffix: /_ctrl.ts$/gi,
+          strict: true,
+          directoryIdentifier: '**/controller.ts',
+          duplicateDefinitionHandling: 'error',
         }),
       ],
     });
 
-    const app = Bun.file('./test/dist/app-suffix.js');
-    const appContent = await app.text();
+    expect(build.success).toBe(false);
+  });
 
-    const script = document.createElement('script');
-    script.type = 'text/javascript';
-    script.textContent = appContent;
+  test('Handling duplicate controllers with callback should work', async () => {
+    const appContent = await buildWithEntrypointAndOptions('./test/src/options/app-duplicate-handling.ts', {
+      strict: false,
+      directoryIdentifier: '**/controller.ts',
+      duplicateDefinitionHandling(exisitingDefinition, duplicateDefinition) {
+        expect(exisitingDefinition).toHaveProperty('identifier', 'duplicate');
+        expect(duplicateDefinition).toHaveProperty('identifier', 'duplicate');
 
-    document.head.appendChild(script);
+        return 'ignore';
+      },
+    });
 
-    const definitions = importDefinitions('suffix-definitions');
+    removeMeta('duplicate-definitions');
+    appendScriptToDocument(appContent);
+
+    const definitions = importDefinitions('duplicate-definitions');
 
     expect(definitions).toBeArrayOfSize(1);
-    expect(definitions).toEqual(['relative']);
+    expect(definitions).toContain('duplicate');
   });
 });
