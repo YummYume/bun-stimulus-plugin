@@ -1,0 +1,16 @@
+.eslintignore
+.eslintrc
+.gitignore
+.prettierignore
+.prettierrc.json
+bun.lockb
+bun.sh
+bunfig.toml
+compose.yml
+Makefile
+tsconfig.json
+tsup.config.ts
+.changeset
+.github
+node_modules
+test

@@ -5,3 +5,4 @@ package.json
 .vscode/*
 test/build/*
 CHANGELOG.md
+.changeset/*
