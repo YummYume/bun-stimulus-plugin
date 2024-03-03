@@ -1,5 +1,11 @@
 # bun-stimulus-plugin
 
+## 2.0.1
+
+### Patch Changes
+
+- 0e6c277: Lower bundle size by ignoring files.
+
 ## 2.0.0
 
 ### Major Changes
