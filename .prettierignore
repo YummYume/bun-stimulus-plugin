@@ -4,3 +4,4 @@ package.json
 *.lock
 .vscode/*
 test/build/*
+CHANGELOG.md
