@@ -117,12 +117,33 @@ describe('Controllers', () => {
 
     expect(result?.textContent).toBe('Nested absolute controller!');
   });
+
+  test('Non-nested long name controller is registered and works', async () => {
+    document.body.innerHTML = `<p data-controller="relative-long-name"></p>`;
+
+    const result = document.querySelector('p');
+
+    await window.happyDOM.waitUntilComplete();
+
+    expect(result?.textContent).toBe('Relative long name controller!');
+  });
+
+  test('Nested long name controller is registered and works', async () => {
+    document.body.innerHTML = `<p data-controller="nested--relative-long-name"></p>`;
+
+    const result = document.querySelector('p');
+
+    await window.happyDOM.waitUntilComplete();
+
+    expect(result?.textContent).toBe('Nested Relative long name controller!');
+  });
 });
 
 // Ensure controller definitions match the expected values
 // Note: These tests use the already appended meta tags from the 'Controllers' tests
 describe('Controller definitions', () => {
   const relativeDefinitions = ['relative', 'nested--relative'];
+  const relativeLongNameDefinitions = ['relative-long-name', 'nested--relative-long-name'];
   const customDefinitions = ['custom', 'nested--custom'];
   const absoluteDefinitions = ['absolute', 'nested--absolute'];
 
@@ -131,6 +152,12 @@ describe('Controller definitions', () => {
 
     expect(definitions).toBeArrayOfSize(relativeDefinitions.length);
     expect(definitions.sort()).toEqual(relativeDefinitions.sort());
+  });
+
+  test('Definitions for relative long name controllers are valid', () => {
+    const definitions = importDefinitions('relative-long-name-definitions');
+    expect(definitions).toBeArrayOfSize(relativeLongNameDefinitions.length);
+    expect(definitions).toEqual(relativeLongNameDefinitions);
   });
 
   // TODO: Remove skip once custom paths are supported
@@ -186,7 +213,7 @@ describe('Options', () => {
 
     const definitions = importDefinitions('directory-separator-definitions');
 
-    expect(definitions).toContain('nested__relative');
+    expect(definitions).toContain('nested--relative');
   });
 
   test('Controller suffix option works', async () => {
@@ -215,7 +242,7 @@ describe('Options', () => {
     const definitions = importDefinitions('directory-definitions');
 
     expect(definitions).toBeArrayOfSize(2);
-    expect(definitions.sort()).toEqual(['directory', 'directory_controller'].sort());
+    expect(definitions.sort()).toEqual(['directory', 'directory-controller'].sort());
   });
 
   test('Directory-based controllers with suffix should work', async () => {

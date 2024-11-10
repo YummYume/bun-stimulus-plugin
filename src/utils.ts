@@ -179,5 +179,10 @@ export const parseControllers = (controllersPath: string, params: ParseControlle
   // Write the import statements
   const contents = definitions.map((definition) => `import ${definition.name} from '${definition.path}';`).join('');
 
+  // Replace all _ with - in identifiers
+  for (const definition of definitions) {
+    definition.identifier = definition.identifier.replace(/_/g, '-');
+  }
+
   return { definitions: definitions.map(({ identifier, name }) => ({ identifier, name })), contents };
 };
