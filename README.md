@@ -82,9 +82,6 @@ Imports work with relative as well as absolute paths. By default, invalid paths 
 
 This plugin can receive an options object as its first argument.
 
-> [!WARNING]  
-> The `directorySeparator` option is deprecated and will be removed in version 3.0.0. Stimulus expects all separators to be `-`.
-
 ```ts
 await Bun.build({
     // ...
@@ -96,22 +93,20 @@ await Bun.build({
             controllerDirectorySuffix: null, // Only load controllers from directories with this suffix (will be stripped from the controller's identifier)
             fileIdentifier: '**/*', // The glob pattern to use for controller files (set to null to ignore file-based controllers)
             directoryIdentifier: null, // The glob pattern to use for directories (set to null to ignore directory-based controllers)
-            directorySeparator: '--', // The separator used for nested controllers - !DEPRECATED!
             duplicateDefinitionHandling: 'ignore', // How to handle duplicate definitions
         }),
     ],
 });
 ```
 
-| Option                            | Type                                           | Description                                                                                                                                                        |
-| --------------------------------- | ---------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `strict`                          | `boolean`                                      | If set to true, the plugin will throw an error if a given path is not a directory. Otherwise, it will simply ignore the path. Defaults to `true`.                  |
-| `controllerSuffix`                | `RegExp \| null`                               | The suffix of the controller files to load. This suffix will be stripped from the controller's identifier. Defaults to `/(-\|_)controller.(js\|ts\|jsx\|tsx)$/gi`. |
-| `controllerDirectorySuffix`       | `RegExp \| null`                               | The suffix of the directories to load controllers from. This suffix will be stripped from the controller's identifier. Defaults to `null`.                         |
-| `fileIdentifier`                  | `string \| null`                               | The glob pattern to use for controller files. Can be set to `null` to ignore file-based controllers. Defaults to `**/*`.                                           |
-| `directoryIdentifier`             | `string \| null`                               | The glob pattern to use for directories. Can be set to `null` to ignore directory-based controllers. Defaults to `null`.                                           |
-| (deprecated) `directorySeparator` | `string`                                       | The directory separator to use when parsing nested controllers. Defaults to '--'. Will be removed in version 3.0.0.                                                |
-| `duplicateDefinitionHandling`     | `'ignore' \| 'replace' \| 'error' \| function` | How to handle duplicate definitions. Can be `'ignore'`, `'replace'` or `'error'`. A callback can also be provided. Defaults to `'ignore'`.                         |
+| Option                        | Type                                           | Description                                                                                                                                                        |
+| ----------------------------- | ---------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `strict`                      | `boolean`                                      | If set to true, the plugin will throw an error if a given path is not a directory. Otherwise, it will simply ignore the path. Defaults to `true`.                  |
+| `controllerSuffix`            | `RegExp \| null`                               | The suffix of the controller files to load. This suffix will be stripped from the controller's identifier. Defaults to `/(-\|_)controller.(js\|ts\|jsx\|tsx)$/gi`. |
+| `controllerDirectorySuffix`   | `RegExp \| null`                               | The suffix of the directories to load controllers from. This suffix will be stripped from the controller's identifier. Defaults to `null`.                         |
+| `fileIdentifier`              | `string \| null`                               | The glob pattern to use for controller files. Can be set to `null` to ignore file-based controllers. Defaults to `**/*`.                                           |
+| `directoryIdentifier`         | `string \| null`                               | The glob pattern to use for directories. Can be set to `null` to ignore directory-based controllers. Defaults to `null`.                                           |
+| `duplicateDefinitionHandling` | `'ignore' \| 'replace' \| 'error' \| function` | How to handle duplicate definitions. Can be `'ignore'`, `'replace'` or `'error'`. A callback can also be provided. Defaults to `'ignore'`.                         |
 
 > [!TIP]
 > Use a [glob pattern matcher](https://www.digitalocean.com/community/tools/glob) to test your glob patterns easily. Behinds the scenes, the plugin uses [Bun's file globbing](https://bun.sh/docs/api/glob).

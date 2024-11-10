@@ -203,19 +203,6 @@ describe('Options', () => {
     expect(build.success).toBe(false);
   });
 
-  test('Directory separator option works', async () => {
-    const appContent = await buildWithEntrypointAndOptions('./test/src/options/app-directory-separator.ts', {
-      strict: false,
-      directorySeparator: '__',
-    });
-
-    appendScriptToDocument(appContent);
-
-    const definitions = importDefinitions('directory-separator-definitions');
-
-    expect(definitions).toContain('nested--relative');
-  });
-
   test('Controller suffix option works', async () => {
     const appContent = await buildWithEntrypointAndOptions('./test/src/options/app-suffix.ts', {
       strict: false,
