@@ -1,8 +1,6 @@
-version: '3.9'
-
 services:
   bun-stimulus-plugin:
-    image: oven/bun:1.0
+    image: oven/bun:1.1
     working_dir: /home/bun/bun-stimulus-plugin
     user: bun
     entrypoint: ['./bun.sh']
