@@ -59,6 +59,7 @@ export type BunStimulusPluginOptions = {
    * The directory separator to use when parsing nested controllers. Defaults to `--`.
    *
    * @since 1.0.0
+   * @deprecated This option is deprecated and will be removed in version 3.0.0. Stimulus expects seperators to always be `-`. See https://github.com/YummYume/bun-stimulus-plugin/issues/17.
    */
   directorySeparator: string;
   /**
