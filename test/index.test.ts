@@ -153,6 +153,7 @@ describe('Controller definitions', () => {
 
   test('Definitions for relative long name controllers are valid', () => {
     const definitions = importDefinitions('relative-long-name-definitions');
+
     expect(definitions).toBeArrayOfSize(relativeLongNameDefinitions.length);
     expect(definitions).toEqual(relativeLongNameDefinitions);
   });
