@@ -1,4 +1,4 @@
-import { BunStimulusPluginOptions, bunStimulusPlugin } from '../src';
+import { bunStimulusPlugin, BunStimulusPluginOptions } from '../src';
 
 /**
  * Imports the definitions from the given meta tag.
@@ -13,7 +13,7 @@ export const importDefinitions = (name: string) => {
     ) as string[];
 
     return definitions;
-  } catch (error) {
+  } catch (_error) {
     return [];
   }
 };

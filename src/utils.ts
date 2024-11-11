@@ -47,12 +47,26 @@ export type ParseControllersOptions = {
 };
 
 /**
+ * The separator used for directories in the controller name.
+ * Was previously a configurable option, but is now a constant to be fully compatible with Stimulus naming conventions.
+ */
+export const directorySeparator = '--';
+
+/**
  * Parses the controller name to make sure it's a valid identifier.
  *
  * @param controllerName The name of the controller.
  * @returns The parsed controller name.
  */
 export const parseControllerName = (controllerName: string) => controllerName.replace(/[^a-zA-Z0-9 ]/g, '_');
+
+/**
+ * Sanitizes the controller identifier to replace all _ with -.
+ *
+ * @param controllerIdentifier The identifier of the controller.
+ * @returns The sanitized controller identifier.
+ */
+export const sanitizeControllerIdentifier = (controllerIdentifier: string) => controllerIdentifier.replace(/_/g, '-');
 
 /**
  * Parse all the controllers in the given path and handle nested controllers.
@@ -91,7 +105,7 @@ export const parseControllers = (controllersPath: string, params: ParseControlle
 
         controllerFiles.push({
           // ['my', 'path', 'to', 'test'] -> my--path--to--test
-          name: [...filePathWithoutFileName, fileNameWithoutSuffix].join(options.directorySeparator),
+          name: [...filePathWithoutFileName, fileNameWithoutSuffix].join(directorySeparator),
           path: controllerPath,
         });
       }
@@ -125,7 +139,7 @@ export const parseControllers = (controllersPath: string, params: ParseControlle
 
         controllerFiles.push({
           // ['path', 'to', 'test'] -> path--to--test
-          name: [...directoryPathWithoutDirectoryName, directoryNameWithoutSuffix].join(options.directorySeparator),
+          name: [...directoryPathWithoutDirectoryName, directoryNameWithoutSuffix].join(directorySeparator),
           path: controllerPath,
         });
       }
@@ -133,7 +147,8 @@ export const parseControllers = (controllersPath: string, params: ParseControlle
   }
 
   for (const [id, controllerFile] of controllerFiles.entries()) {
-    const controllerName = controllerFile.name;
+    // Replace all _ with - in the controller identifier
+    const controllerName = sanitizeControllerIdentifier(controllerFile.name);
     // Controller name should be unique, so we'll add a number to the end of it
     const uniqueControllerName = `${parseControllerName(controllerName)}${id}`;
     // Check if the controller name is already in the definitions

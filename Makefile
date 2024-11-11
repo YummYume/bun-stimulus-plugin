@@ -26,7 +26,7 @@ logs:
 
 # Test
 test:
-	docker run --rm -v $$(pwd):/home/bun/bun-stimulus-plugin -w /home/bun/bun-stimulus-plugin oven/bun:1.0 sh -c "bun install && bun test"
+	docker run --rm -v $$(pwd):/home/bun/bun-stimulus-plugin -w /home/bun/bun-stimulus-plugin oven/bun:1.1 sh -c "bun install && bun test"
 
 # Build
 build:

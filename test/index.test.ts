@@ -1,13 +1,10 @@
-/* eslint-disable no-console */
 /// <reference lib="dom" />
 
-import { test, expect, describe, beforeAll, beforeEach, afterAll } from 'bun:test';
-
 import { rmSync } from 'node:fs';
-
-import { appendScriptToDocument, buildWithEntrypointAndOptions, importDefinitions, removeMeta } from './utils';
+import { afterAll, beforeAll, beforeEach, describe, expect, test } from 'bun:test';
 
 import { bunStimulusPlugin } from '../src';
+import { appendScriptToDocument, buildWithEntrypointAndOptions, importDefinitions, removeMeta } from './utils';
 
 import type { Window } from 'happy-dom';
 
@@ -117,12 +114,33 @@ describe('Controllers', () => {
 
     expect(result?.textContent).toBe('Nested absolute controller!');
   });
+
+  test('Non-nested long name controller is registered and works', async () => {
+    document.body.innerHTML = `<p data-controller="relative-long-name"></p>`;
+
+    const result = document.querySelector('p');
+
+    await window.happyDOM.waitUntilComplete();
+
+    expect(result?.textContent).toBe('Relative long name controller!');
+  });
+
+  test('Nested long name controller is registered and works', async () => {
+    document.body.innerHTML = `<p data-controller="nested--relative-long-name"></p>`;
+
+    const result = document.querySelector('p');
+
+    await window.happyDOM.waitUntilComplete();
+
+    expect(result?.textContent).toBe('Nested Relative long name controller!');
+  });
 });
 
 // Ensure controller definitions match the expected values
 // Note: These tests use the already appended meta tags from the 'Controllers' tests
 describe('Controller definitions', () => {
   const relativeDefinitions = ['relative', 'nested--relative'];
+  const relativeLongNameDefinitions = ['relative-long-name', 'nested--relative-long-name'];
   const customDefinitions = ['custom', 'nested--custom'];
   const absoluteDefinitions = ['absolute', 'nested--absolute'];
 
@@ -131,6 +149,13 @@ describe('Controller definitions', () => {
 
     expect(definitions).toBeArrayOfSize(relativeDefinitions.length);
     expect(definitions.sort()).toEqual(relativeDefinitions.sort());
+  });
+
+  test('Definitions for relative long name controllers are valid', () => {
+    const definitions = importDefinitions('relative-long-name-definitions');
+
+    expect(definitions).toBeArrayOfSize(relativeLongNameDefinitions.length);
+    expect(definitions).toEqual(relativeLongNameDefinitions);
   });
 
   // TODO: Remove skip once custom paths are supported
@@ -176,19 +201,6 @@ describe('Options', () => {
     expect(build.success).toBe(false);
   });
 
-  test('Directory separator option works', async () => {
-    const appContent = await buildWithEntrypointAndOptions('./test/src/options/app-directory-separator.ts', {
-      strict: false,
-      directorySeparator: '__',
-    });
-
-    appendScriptToDocument(appContent);
-
-    const definitions = importDefinitions('directory-separator-definitions');
-
-    expect(definitions).toContain('nested__relative');
-  });
-
   test('Controller suffix option works', async () => {
     const appContent = await buildWithEntrypointAndOptions('./test/src/options/app-suffix.ts', {
       strict: false,
@@ -215,7 +227,7 @@ describe('Options', () => {
     const definitions = importDefinitions('directory-definitions');
 
     expect(definitions).toBeArrayOfSize(2);
-    expect(definitions.sort()).toEqual(['directory', 'directory_controller'].sort());
+    expect(definitions.sort()).toEqual(['directory', 'directory-controller'].sort());
   });
 
   test('Directory-based controllers with suffix should work', async () => {

@@ -56,13 +56,6 @@ export type BunStimulusPluginOptions = {
    */
   directoryIdentifier: string | null;
   /**
-   * The directory separator to use when parsing nested controllers. Defaults to `--`.
-   *
-   * @since 1.0.0
-   * @deprecated This option is deprecated and will be removed in version 3.0.0. Stimulus expects seperators to always be `-`. See https://github.com/YummYume/bun-stimulus-plugin/issues/17.
-   */
-  directorySeparator: string;
-  /**
    * How to handle duplicate controller definitions. Duplicate definitions can either be ignored, replaced, or throw an error.
    * A callback can also be provided to handle the duplicate definitions. It should return either `error`, `ignore`, or `replace`.
    * Defaults to `ignore`.
@@ -89,7 +82,6 @@ const defaultOptions: BunStimulusPluginOptions = {
   controllerDirectorySuffix: null,
   fileIdentifier: '**/*',
   directoryIdentifier: null,
-  directorySeparator: '--',
   duplicateDefinitionHandling: 'ignore',
 };
 
