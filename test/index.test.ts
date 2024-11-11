@@ -1,13 +1,10 @@
-/* eslint-disable no-console */
 /// <reference lib="dom" />
 
-import { test, expect, describe, beforeAll, beforeEach, afterAll } from 'bun:test';
-
 import { rmSync } from 'node:fs';
-
-import { appendScriptToDocument, buildWithEntrypointAndOptions, importDefinitions, removeMeta } from './utils';
+import { afterAll, beforeAll, beforeEach, describe, expect, test } from 'bun:test';
 
 import { bunStimulusPlugin } from '../src';
+import { appendScriptToDocument, buildWithEntrypointAndOptions, importDefinitions, removeMeta } from './utils';
 
 import type { Window } from 'happy-dom';
 

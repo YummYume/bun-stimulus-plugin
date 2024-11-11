@@ -1,5 +1,4 @@
-.eslintignore
-.eslintrc
+eslint.config.js
 .gitignore
 .prettierignore
 .prettierrc.json
